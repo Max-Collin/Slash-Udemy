@@ -6,6 +6,7 @@
 #include "Engine/Engine.h"
 #include "Components/SphereComponent.h"
 #include "Characters/SlashCharacter.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 AItem::AItem()
@@ -19,7 +20,8 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(GetRootComponent());
 	
-	
+	EmberEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	EmberEffect->SetupAttachment(GetRootComponent());
 
 }
 
@@ -49,6 +51,7 @@ void AItem::Tick(float DeltaTime)
 	if (ItemState == EItemState::EIS_Hovering)
 	{
 		AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
+		AddActorWorldRotation(FRotator(0.f,DeltaTime*60,0.f));
 	}
 
 

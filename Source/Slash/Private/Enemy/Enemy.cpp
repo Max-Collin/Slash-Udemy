@@ -9,7 +9,8 @@
 
 #include "Slash/DebugMacros.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Misc/LowLevelTestAdapter.h"
+
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -100,7 +101,7 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 
 	PlayHitReactMontage(Section);
 	
-
+	/*
 	if(GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(1,5.f,FColor::Green,FString::Printf(TEXT("Theta: %f"),Theta));
@@ -108,13 +109,26 @@ void AEnemy::DirectionalHitReact(const FVector& ImpactPoint)
 	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(),GetActorLocation()+Forward*60,5.f,FColor::Red, 5.f);
 	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(),GetActorLocation()+ToHit*60,5.f,FColor::Green,5.f);
 	UKismetSystemLibrary::DrawDebugArrow(this,GetActorLocation(),GetActorLocation()+CrossProduct*100,5.f,FColor::Blue, 5.f);
+
+
+	*/
 }
 
-void AEnemy::GetHit(const FVector& ImpactPoint)
+void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 {
-	DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
+	//DRAW_SPHERE_COLOR(ImpactPoint, FColor::Orange);
 	
 	DirectionalHitReact(ImpactPoint);
+
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this,HitSound,ImpactPoint);
+	}
+	if(HitParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this,HitParticles,ImpactPoint);
+	}
+	
 
 	
 }

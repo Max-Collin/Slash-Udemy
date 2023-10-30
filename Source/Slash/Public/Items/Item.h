@@ -6,12 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "Item.generated.h"
 
+class UNiagaraComponent;
 class USphereComponent;
 
 enum class EItemState : uint8
 {
 	EIS_Hovering,
-	EIS_Equipped
+	EIS_Equipped,
+	EIS_NotHovering
 	
 };
 
@@ -57,8 +59,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
     		TObjectPtr<UStaticMeshComponent>ItemMesh;
 
-
+	
 	EItemState ItemState = EItemState::EIS_Hovering;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraComponent> EmberEffect;
 	
 
 private:
