@@ -104,7 +104,8 @@ void ASlashCharacter::Equip()
 	TObjectPtr<AWeapon> OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if(OverlappingItem)
 	{
-		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"));
+		OverlappingWeapon->Equip(GetMesh(),FName("RightHandSocket"),this,this);
+	
 		CharacterState = ECharacterState::ESC_EquippedOneHandedWeapon;
 		OverlappingItem =nullptr;
 		EquipedWeapon = OverlappingWeapon;

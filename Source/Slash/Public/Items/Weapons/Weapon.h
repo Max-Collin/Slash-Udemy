@@ -33,9 +33,9 @@ public:
 	
 
 	virtual void Tick(float DeltaSeconds) override;
-	void AttachMeshToSocket(USceneComponent* InParent, FName InSocketName);
+	void AttachMeshToSocket(TObjectPtr<USceneComponent>  InParent, FName InSocketName);
 
-	void Equip(USceneComponent* InParent, FName InSocketName);
+	void Equip(TObjectPtr<USceneComponent> InParent, FName InSocketName, TObjectPtr<AActor> NewOwner,TObjectPtr<APawn>NewInstigator);
 	
 	TArray<TObjectPtr<AActor>> IgnoreActors;
 private:
@@ -48,7 +48,8 @@ private:
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<USceneComponent> BoxTraceEnd;
 
-	
+	UPROPERTY(EditAnywhere,Category = "Weapon Properties")
+		float Damage = 20.f;
 
 	
 public:	

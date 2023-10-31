@@ -7,6 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/HitInterface.h"
 #include "NiagaraComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AWeapon::AWeapon()
 {
@@ -67,13 +68,15 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
 		if(HitInterface)
 		{
-			
+			UGameplayStatics::ApplyDamage(BoxHit.GetActor(),Damage,GetInstigator()->GetController(),this,UDamageType::StaticClass());
 			HitInterface->Execute_GetHit(BoxHit.GetActor(),BoxHit.ImpactPoint);
 		}
 		IgnoreActors.AddUnique(BoxHit.GetActor());
 		
 
 		CreateFields(BoxHit.ImpactPoint);
+
+		
 		
 	}
 }
@@ -84,13 +87,13 @@ void AWeapon::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void AWeapon::AttachMeshToSocket(USceneComponent* InParent, FName InSocketName)
+void AWeapon::AttachMeshToSocket(TObjectPtr<USceneComponent>  InParent, FName InSocketName)
 {
 	FAttachmentTransformRules TransformRules(EAttachmentRule::SnapToTarget,true);
 	ItemMesh->AttachToComponent(InParent,TransformRules,InSocketName);
 }
 
-void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
+void AWeapon::Equip(TObjectPtr<USceneComponent> InParent, FName InSocketName, TObjectPtr<AActor> NewOwner,TObjectPtr<APawn>NewInstigator)
 {
 
 	AttachMeshToSocket(InParent, InSocketName);
@@ -102,7 +105,8 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName)
 	EmberEffect->Deactivate();
 	}
 	
-	
+	SetOwner(NewOwner);
+	SetInstigator(NewInstigator);
 	
 	
 }
