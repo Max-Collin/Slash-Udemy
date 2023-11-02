@@ -9,6 +9,7 @@
 
 #include "Enemy.generated.h"
 
+
 class UHealthBarComponent;
 
 class UAttributeComponent;
@@ -35,6 +36,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Die();
+	bool InTargetRange(TObjectPtr<AActor> Target, double Radius);
+	void MovetoTarget(TObjectPtr<AActor> Target);
+	TObjectPtr<AActor> ChoosePatrolTarget();
 	
 	/**
 	 *Play Montage functions
@@ -52,8 +56,7 @@ private:
 		TObjectPtr<UHealthBarComponent> HealthBarWidget;
 	UPROPERTY()
 	TObjectPtr<AActor> CombatTarget;
-	UPROPERTY(EditAnywhere)
-	double CombatRadius=500.f;
+	
 	
 	/**
 	 * Animaation montages
@@ -71,7 +74,28 @@ private:
 		TObjectPtr<UParticleSystem> HitParticles;
 
 	
-public:	
+
+	/**
+	 * Navigation
+	 */
+
+	UPROPERTY()
+		class AAIController* EnemyController;
+	//current patrol target
+	UPROPERTY(EditInstanceOnly, Category="AI Navigation")
+		TObjectPtr<AActor> PatrolTarget;
+	//array of patrol targets
+	UPROPERTY(EditInstanceOnly, Category="AI Navigation")
+		TArray<TObjectPtr<AActor>> PatrolTargets;
+	UPROPERTY(EditAnywhere)
+		double CombatRadius=500.f;
+	UPROPERTY(EditAnywhere)
+		double PatrolRadius=1000.f;
+
+	FTimerHandle PatrolTimer;
+	void PatrolTimerFinished();
 	
+public:	
+		
 
 };

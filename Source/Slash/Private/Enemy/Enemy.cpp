@@ -14,7 +14,10 @@
 #include "Kismet/GameplayStatics.h"
 #include  "Components/AttributeComponent.h"
 #include "Hud/HealthBarComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include  "AIController.h"
 
+#include "Navigation/PathFollowingComponent.h"
 
 
 // Sets default values
@@ -33,18 +36,28 @@ AEnemy::AEnemy()
 
 	HealthBarWidget =CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
+
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
+	bUseControllerRotationPitch=false;
+	bUseControllerRotationRoll=false;
+	bUseControllerRotationYaw=false;
 }
 
 
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	if(HealthBarWidget)
 	{
 		HealthBarWidget->SetVisibility(false);
 	}
-
 	
+	EnemyController = Cast<AAIController>(GetController());
+
+	MovetoTarget(PatrolTarget);
+	GetWorldTimerManager().SetTimer(PatrolTimer,this,&AEnemy::PatrolTimerFinished,5.f,true);
 	
 }
 
@@ -92,6 +105,65 @@ void AEnemy::Die()
 	}
 	
 }
+
+bool AEnemy::InTargetRange(TObjectPtr<AActor> Target, double Radius)
+{
+
+	if(Target == nullptr) return false;
+	const double DistanceToTarget = (Target->GetActorLocation() - GetActorLocation()).Size();
+	DRAW_SPHERE_SINGLE_FRAME(GetActorLocation())
+	DRAW_SPHERE_SINGLE_FRAME(Target->GetActorLocation())
+	
+	UE_LOG(LogTemp, Warning, TEXT("The integer value is: %f"), DistanceToTarget);
+	return DistanceToTarget <= Radius;
+}
+
+void AEnemy::MovetoTarget(TObjectPtr<AActor> Target)
+{
+	UE_LOG(LogTemp,Warning,TEXT("MovetoTarget"))
+	if(EnemyController == nullptr || Target==nullptr)return;
+	
+	//FTimerDelegate TimerDelegate;
+	//FTimerHandle TimerHandle; 
+    
+	//TimerDelegate.BindLambda([&] { 
+	FAIMoveRequest MoveRequest;
+	MoveRequest.SetGoalActor(Target);
+	MoveRequest.SetAcceptanceRadius(15.f);
+	EnemyController->MoveTo(MoveRequest);
+//	}); 
+ 
+//	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 3.f, false);		
+			
+		
+		
+	
+}
+
+TObjectPtr<AActor> AEnemy::ChoosePatrolTarget()
+{
+	
+
+			TArray<TObjectPtr<AActor>> ValidTargets;
+			for(TObjectPtr<AActor> Target:PatrolTargets)
+			{
+				if(Target != PatrolTarget)
+				{
+					ValidTargets.AddUnique(Target);
+				}
+				
+			}
+			
+			const int32 NumPatrolTargets = ValidTargets.Num();
+			if(NumPatrolTargets>0)
+			{
+				const int32 TargetSelection = FMath::RandRange(0,NumPatrolTargets-1);
+				return  ValidTargets[TargetSelection];
+				
+			}
+	return nullptr;
+}
+
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
 	TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
@@ -104,22 +176,52 @@ void AEnemy::PlayHitReactMontage(const FName& SectionName)
 	
 }
 
+void AEnemy::PatrolTimerFinished()
+{
+	if(GetCharacterMovement()->Velocity.Size() == 0)
+	{
+			if(InTargetRange(PatrolTarget,PatrolRadius))
+        	{
+        		UE_LOG(LogTemp,Warning,TEXT("if good"))
+        		PatrolTarget=ChoosePatrolTarget();
+        		
+        		
+        	}
+        
+        	
+        	UE_LOG(LogTemp,Warning,TEXT("patrol timer"))
+        	MovetoTarget(PatrolTarget);
+	}
+	else{	UE_LOG(LogTemp,Warning,TEXT("still moving"))}
+
+	
+}
+
 
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if(CombatTarget)
 	{
-		const double DistanceToTarget =	(CombatTarget->GetActorLocation() - GetActorLocation()).Size();
-		if(DistanceToTarget>CombatRadius)
+		
+		if(!InTargetRange(CombatTarget,CombatRadius))
 		{
 			CombatTarget=nullptr;
 			HealthBarWidget->SetVisibility(false);
 		}
 	}
-		
-
+	
+	
+	
 }
+				
+			
+		
+			
+		
+		
+	
+
 
 void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
