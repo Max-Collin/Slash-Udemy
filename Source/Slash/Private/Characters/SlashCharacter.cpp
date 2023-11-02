@@ -72,7 +72,8 @@ void ASlashCharacter::BeginPlay()
 			Subsystem->AddMappingContext(IMC_Slash,0);
 		}
 	}
-	
+
+	Tags.Add(FName("Player"));
 }
 
 void ASlashCharacter::Move(const FInputActionValue& Value)

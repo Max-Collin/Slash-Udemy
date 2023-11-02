@@ -18,6 +18,7 @@
 #include  "AIController.h"
 
 #include "Navigation/PathFollowingComponent.h"
+#include "Perception/PawnSensingComponent.h"
 
 
 // Sets default values
@@ -37,11 +38,15 @@ AEnemy::AEnemy()
 	HealthBarWidget =CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 	HealthBarWidget->SetupAttachment(GetRootComponent());
 
-
+	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
+	PawnSensing->SightRadius = 4000.f;
+	PawnSensing->SetPeripheralVisionAngle(45.f);
+	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch=false;
 	bUseControllerRotationRoll=false;
 	bUseControllerRotationYaw=false;
+	
 }
 
 
@@ -58,7 +63,11 @@ void AEnemy::BeginPlay()
 
 	MovetoTarget(PatrolTarget);
 	GetWorldTimerManager().SetTimer(PatrolTimer,this,&AEnemy::PatrolTimerFinished,5.f,true);
-	
+
+	if(PawnSensing)
+	{
+		PawnSensing->OnSeePawn.AddDynamic(this,  &AEnemy::PawnSeen);
+	}
 }
 
 void AEnemy::Die()
@@ -164,6 +173,20 @@ TObjectPtr<AActor> AEnemy::ChoosePatrolTarget()
 	return nullptr;
 }
 
+void AEnemy::PawnSeen(APawn* SeenPawn)
+{
+	if(EnemyState==EEnemyState::EES_Chasing)return;
+	if(SeenPawn->ActorHasTag(FName("Player")))
+	{
+		EnemyState = EEnemyState::EES_Chasing;
+		
+		GetCharacterMovement()->MaxWalkSpeed = 300.f;
+		CombatTarget = SeenPawn;
+		MovetoTarget(CombatTarget);
+	}
+	
+}
+
 void AEnemy::PlayHitReactMontage(const FName& SectionName)
 {
 	TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
@@ -201,18 +224,34 @@ void AEnemy::PatrolTimerFinished()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if(CombatTarget)
+
+	
+	if(EnemyState > EEnemyState::EES_Patrolling)
 	{
-		
-		if(!InTargetRange(CombatTarget,CombatRadius))
+		GetWorldTimerManager().PauseTimer(PatrolTimer);
+			if(CombatTarget)
+        	{
+        		
+        		if(!InTargetRange(CombatTarget,CombatRadius))
+        		{
+        			CombatTarget=nullptr;
+        			if(HealthBarWidget)
+        			{
+        					HealthBarWidget->SetVisibility(false);
+        			}
+        			EnemyState = EEnemyState::EES_Patrolling;
+        			GetCharacterMovement()->MaxWalkSpeed = 125.f;
+        			MovetoTarget(PatrolTarget);
+        		}
+        	}
+	}
+	else
+	{
+		if(GetWorldTimerManager().IsTimerPaused(PatrolTimer))
 		{
-			CombatTarget=nullptr;
-			HealthBarWidget->SetVisibility(false);
+			GetWorldTimerManager().UnPauseTimer(PatrolTimer);
 		}
 	}
-	
-	
-	
 }
 				
 			

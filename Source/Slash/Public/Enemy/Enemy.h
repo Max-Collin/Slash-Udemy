@@ -14,6 +14,7 @@ class UHealthBarComponent;
 
 class UAttributeComponent;
 class UAnimMontage;
+class UPawnSensingComponent;
 
 UCLASS()
 class SLASH_API AEnemy : public ACharacter , public IHitInterface
@@ -40,6 +41,11 @@ protected:
 	void MovetoTarget(TObjectPtr<AActor> Target);
 	TObjectPtr<AActor> ChoosePatrolTarget();
 	
+	UFUNCTION()
+		void PawnSeen(APawn* SeenPawn);
+
+
+	
 	/**
 	 *Play Montage functions
 	 */
@@ -49,17 +55,21 @@ protected:
 	EDeathPose DeathPose = EDeathPose::EDP_Alive;
 	
 private:
+
+	/*
+	 *Components
+	 */
 	
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<UAttributeComponent> Attributes;
 	UPROPERTY(VisibleAnywhere)
 		TObjectPtr<UHealthBarComponent> HealthBarWidget;
-	UPROPERTY()
-	TObjectPtr<AActor> CombatTarget;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPawnSensingComponent> PawnSensing;
 	
 	
 	/**
-	 * Animaation montages
+	 * Animation montages
 	 */
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		TObjectPtr<UAnimMontage> HitReactMontage;
@@ -91,9 +101,12 @@ private:
 		double CombatRadius=500.f;
 	UPROPERTY(EditAnywhere)
 		double PatrolRadius=1000.f;
-
+	UPROPERTY()
+		TObjectPtr<AActor> CombatTarget;
 	FTimerHandle PatrolTimer;
 	void PatrolTimerFinished();
+
+	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 	
 public:	
 		
