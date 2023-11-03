@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BaseCharacter.h"
 #include "InputActionValue.h"
-#include "GameFramework/Character.h"
+
 #include "Characters/CharacterTypes.h"
 #include "SlashCharacter.generated.h"
 
 
-class AWeapon;
+
 class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
@@ -24,7 +25,7 @@ class UAnimMontage;
 
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ACharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -32,8 +33,7 @@ public:
 	// Sets default values for this character's properties
 	ASlashCharacter();
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	
 
 
 protected:
@@ -62,13 +62,13 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
-	void Attack();
+	virtual void Attack() override;
 
 	
 	/**
 	 *Play Montage functions
 	 */
-	void PlayAttackMontage();
+	virtual void PlayAttackMontage() override;
 	void PlayEquipMontage(FName SectionName);
 
 	UFUNCTION(BlueprintCallable)
@@ -102,14 +102,7 @@ private:
 	UPROPERTY(VisibleInstanceOnly)
 		TObjectPtr<AItem> OverlappingItem;
 
-	UPROPERTY(VisibleAnywhere, Category = Weapon)
-	TObjectPtr<AWeapon>EquipedWeapon;
-
-	/**
-	 * Animaation montages
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-	TObjectPtr<UAnimMontage> AttackMontage;
+	
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
     	TObjectPtr<UAnimMontage> EquipMontage;
 

@@ -17,7 +17,7 @@
 #include "Items/Item.h"
 #include  "items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
-#include "Components/BoxComponent.h"
+
 // Sets default values
 ASlashCharacter::ASlashCharacter()
 {
@@ -51,14 +51,7 @@ ASlashCharacter::ASlashCharacter()
 	
 }
 
-void ASlashCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
-{
-	if(EquipedWeapon&&EquipedWeapon->GetWeaponBox())
-	{
-		EquipedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquipedWeapon->IgnoreActors.Empty();
-	}
-}
+
 
 // Called when the game starts or when spawned
 void ASlashCharacter::BeginPlay()
@@ -143,9 +136,7 @@ void ASlashCharacter::Attack()
 		PlayAttackMontage();
 		ActionState = EActionState::EAS_Attacking;
 	}
-	
-	
-	
+
 }
 
 void ASlashCharacter::PlayAttackMontage()
