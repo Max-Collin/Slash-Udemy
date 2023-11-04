@@ -20,54 +20,41 @@ class SLASH_API ABaseCharacter : public ACharacter , public IHitInterface
 public:
 	
 	ABaseCharacter();
-
+	virtual void Tick(float DeltaTime) override;
 protected:
-	
 	virtual void BeginPlay() override;
+	
 	virtual void Attack();
 	virtual void Die();
 	virtual  bool CanAttack();
 	bool IsAlive();
 	void  DisableCapsule();
 	
-
+	UFUNCTION(BlueprintCallable)
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void AttackEnd();
+	
 	/**
 	 *Play Montage functions
 	 */
-	
 	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
-	void PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const FName& SectionName);
-	int32 PlayRandomMontageSetion(TObjectPtr<UAnimMontage> Montage,const TArray<FName>& SectionNames);
 	virtual  int32 PlayDeathMontage();
 	virtual  int32 PlayAttackMontage();
 
 
-
-	
 	void PlayHitSound(const FVector& ImpactPoint);
-	void SpawnHitPartilces (const FVector& ImpactPoint);
+	void SpawnHitParticles (const FVector& ImpactPoint);
 
 	virtual void HandleDamage(float DamageAmount);
 	
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
-		TObjectPtr<AWeapon>EquipedWeapon;
+	TObjectPtr<AWeapon>EquippedWeapon;
 	
 
-	/**
-	 * Animation montages
-	 */
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-		TObjectPtr<UAnimMontage> AttackMontage;
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-		TObjectPtr<UAnimMontage> HitReactMontage;
-	UPROPERTY(EditDefaultsOnly, Category = Montages)
-		UAnimMontage* DeathMontage;
-	UPROPERTY(EditAnywhere,Category = combat)
-		TArray<FName> AttackMontageSections;
 
-	UPROPERTY(EditAnywhere,Category = combat)
-	TArray<FName> DeathMontageSections;
 	
 	/*
 	* Components
@@ -75,18 +62,34 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAttributeComponent> Attributes;
 private:
-		
+	void PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const FName& SectionName);
+	int32 PlayRandomMontageSection(TObjectPtr<UAnimMontage> Montage,const TArray<FName>& SectionNames);
+	
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
 	UPROPERTY(EditAnywhere, Category = VisualEffects)
 	UParticleSystem* HitParticles;
 
+	/**
+	 * Animation montages
+	*/
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	TObjectPtr<UAnimMontage> AttackMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	TObjectPtr<UAnimMontage> HitReactMontage;
+	
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* DeathMontage;
+	
+	UPROPERTY(EditAnywhere,Category = combat)
+	TArray<FName> AttackMontageSections;
+
+	UPROPERTY(EditAnywhere,Category = combat)
+	TArray<FName> DeathMontageSections;
 public:	
 	
-	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 	
 	

@@ -26,6 +26,10 @@ void ABaseCharacter::Attack()
 {
 }
 
+void ABaseCharacter::AttackEnd()
+{
+}
+
 void ABaseCharacter::Die()
 {
 }
@@ -48,7 +52,7 @@ void ABaseCharacter::DisableCapsule()
 
 int32 ABaseCharacter::PlayAttackMontage()
 {
-	return PlayRandomMontageSetion(AttackMontage,AttackMontageSections);
+	return PlayRandomMontageSection(AttackMontage,AttackMontageSections);
 	
 }
 
@@ -64,7 +68,7 @@ void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
 	}
 }
 
-void ABaseCharacter::SpawnHitPartilces(const FVector& ImpactPoint)
+void ABaseCharacter::SpawnHitParticles(const FVector& ImpactPoint)
 {
 	if (HitParticles && GetWorld())
 	{
@@ -148,7 +152,7 @@ void ABaseCharacter::PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const 
 	}
 }
 
-int32 ABaseCharacter::PlayRandomMontageSetion(TObjectPtr<UAnimMontage> Montage, const TArray<FName>& SectionNames)
+int32 ABaseCharacter::PlayRandomMontageSection(TObjectPtr<UAnimMontage> Montage, const TArray<FName>& SectionNames)
 {
 	if(SectionNames.IsEmpty()) return -1 ;
 		const int32  MaxSectionsIndex = SectionNames.Num()-1;
@@ -162,7 +166,7 @@ int32 ABaseCharacter::PlayRandomMontageSetion(TObjectPtr<UAnimMontage> Montage, 
 int32 ABaseCharacter::PlayDeathMontage()
 {
 	
-	return PlayRandomMontageSetion(DeathMontage,DeathMontageSections);
+	return PlayRandomMontageSection(DeathMontage,DeathMontageSections);
 
 	
 }
@@ -175,10 +179,10 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 {
-	if(EquipedWeapon&&EquipedWeapon->GetWeaponBox())
+	if(EquippedWeapon&&EquippedWeapon->GetWeaponBox())
 	{
-		EquipedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquipedWeapon->IgnoreActors.Empty();
+		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedWeapon->IgnoreActors.Empty();
 	}
 }
 

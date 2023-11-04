@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "BaseCharacter.h"
 #include "InputActionValue.h"
-
 #include "Characters/CharacterTypes.h"
+
 #include "SlashCharacter.generated.h"
 
 
@@ -20,55 +20,44 @@ class AItem;
 class UAnimMontage;
 
 
-
-
-
-
 UCLASS()
 class SLASH_API ASlashCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+
 	ASlashCharacter();
-
 	
-
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Jump() override;
 
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
-	/**
-	 * Inputs
-	 */
-
 	
+	 /** Inputs */
 	
 	UPROPERTY(EditAnywhere, Category = Input)
-		TObjectPtr<UInputMappingContext> IMC_Slash;
+	TObjectPtr<UInputMappingContext> IMC_Slash;
 	UPROPERTY(	EditAnywhere, Category = Input)
-		TObjectPtr<UInputAction> MovementAction;
+	TObjectPtr<UInputAction> MovementAction;
 	UPROPERTY(	EditAnywhere, Category = Input)
-	    TObjectPtr<UInputAction> LookAction;
+	TObjectPtr<UInputAction> LookAction;
 	UPROPERTY(	EditAnywhere, Category = Input)
-	    TObjectPtr<UInputAction> JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 	UPROPERTY(	EditAnywhere, Category = Input)
-		TObjectPtr<UInputAction> EquipAction;
+	TObjectPtr<UInputAction> EquipAction;
 	UPROPERTY(	EditAnywhere, Category = Input)
-		TObjectPtr<UInputAction> AttackAction;
+	TObjectPtr<UInputAction> AttackAction;
 	    
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
+	/*Combat*/
 	virtual void Attack() override;
 	virtual  bool CanAttack() override;
-	
-	/**
-	 *Play Montage functions
-	 */
-
 	void PlayEquipMontage(FName SectionName);
 
 	UFUNCTION(BlueprintCallable)
@@ -80,34 +69,31 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void FinishEquipping();
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	virtual void Jump() override;
 private:
+	/*Character Components*/
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> ViewCamera;
 	
 	UPROPERTY(VisibleAnywhere ,Category = Hair)
-		TObjectPtr<UGroomComponent> Hair;
+	TObjectPtr<UGroomComponent> Hair;
+	
 	UPROPERTY(VisibleAnywhere,Category = Hair)
-		TObjectPtr<UGroomComponent> EyeBrows;
+	TObjectPtr<UGroomComponent> EyeBrows;
 
 	UPROPERTY(VisibleInstanceOnly)
-		TObjectPtr<AItem> OverlappingItem;
-
+	TObjectPtr<AItem> OverlappingItem;
 	
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
-    	TObjectPtr<UAnimMontage> EquipMontage;
+	TObjectPtr<UAnimMontage> EquipMontage;
 
 	
 	ECharacterState CharacterState = ECharacterState::ESC_Unequipped;
+	
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess="true"))
 	EActionState ActionState = EActionState:: EAS_Unoccupied;
 public:

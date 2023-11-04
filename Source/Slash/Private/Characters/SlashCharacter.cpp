@@ -2,15 +2,11 @@
 
 
 #include "Characters/SlashCharacter.h"
-
-
 #include "Components/InputComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
 #include "Characters/CharacterTypes.h"
@@ -22,7 +18,7 @@
 ASlashCharacter::ASlashCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -38,12 +34,10 @@ ASlashCharacter::ASlashCharacter()
 	
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewCamera"));
 	ViewCamera->SetupAttachment(SpringArm);
-
-
+	
 	Hair = CreateDefaultSubobject<UGroomComponent>(TEXT("Hair"));
 	Hair->SetupAttachment(GetMesh());
 	Hair->AttachmentName = FString("head");
-
 
 	EyeBrows = CreateDefaultSubobject<UGroomComponent>(TEXT("EyeBrows"));
 	EyeBrows->SetupAttachment(GetMesh());
@@ -51,9 +45,6 @@ ASlashCharacter::ASlashCharacter()
 	
 }
 
-
-
-// Called when the game starts or when spawned
 void ASlashCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -102,7 +93,7 @@ void ASlashCharacter::Equip()
 	
 		CharacterState = ECharacterState::ESC_EquippedOneHandedWeapon;
 		OverlappingItem =nullptr;
-		EquipedWeapon = OverlappingWeapon;
+		EquippedWeapon = OverlappingWeapon;
 		
 		
 	}
@@ -116,7 +107,7 @@ void ASlashCharacter::Equip()
 			
 			
 		}
-		else if(ActionState == EActionState::EAS_Unoccupied && CharacterState == ECharacterState::ESC_Unequipped &&EquipedWeapon)
+		else if(ActionState == EActionState::EAS_Unoccupied && CharacterState == ECharacterState::ESC_Unequipped &&EquippedWeapon)
 		{
 			PlayEquipMontage(FName ("Equip"));
 			CharacterState=ECharacterState::ESC_EquippedOneHandedWeapon;
@@ -124,9 +115,6 @@ void ASlashCharacter::Equip()
 			ActionState = EActionState::EAS_EquippingWeapon;
 		}
 	}		
-	
-
-	
 }
 
 void ASlashCharacter::Attack()
@@ -159,18 +147,18 @@ void ASlashCharacter::PlayEquipMontage(FName SectionName)
 
 void ASlashCharacter::Disarm()
 {
-	if(EquipedWeapon)
+	if(EquippedWeapon)
 	{
-		EquipedWeapon->AttachMeshToSocket(GetMesh(),FName("SpineSocket"));
+		EquippedWeapon->AttachMeshToSocket(GetMesh(),FName("SpineSocket"));
 	}
 }
 
 void ASlashCharacter::Arm()
 {
 	
-	if(EquipedWeapon)
+	if(EquippedWeapon)
 	{
-		EquipedWeapon->AttachMeshToSocket(GetMesh(),FName("RightHandSocket"));
+		EquippedWeapon->AttachMeshToSocket(GetMesh(),FName("RightHandSocket"));
 	}
 }
 
@@ -184,12 +172,7 @@ void ASlashCharacter::Jump()
 	Super::Jump();
 }
 
-// Called every frame
-void ASlashCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 
 // Called to bind functionality to input
 void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -199,7 +182,6 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	if(UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MovementAction,ETriggerEvent::Triggered,this,&ASlashCharacter::Move);
-
 		EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&ASlashCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Started,this,&ASlashCharacter::Jump);
 		EnhancedInputComponent->BindAction(EquipAction,ETriggerEvent::Started,this,&ASlashCharacter::Equip);
