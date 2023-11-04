@@ -63,12 +63,12 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Equip();
 	virtual void Attack() override;
-
+	virtual  bool CanAttack() override;
 	
 	/**
 	 *Play Montage functions
 	 */
-	virtual void PlayAttackMontage() override;
+
 	void PlayEquipMontage(FName SectionName);
 
 	UFUNCTION(BlueprintCallable)

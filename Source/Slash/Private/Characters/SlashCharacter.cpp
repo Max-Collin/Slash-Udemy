@@ -131,7 +131,8 @@ void ASlashCharacter::Equip()
 
 void ASlashCharacter::Attack()
 {
-	if(ActionState == EActionState::EAS_Unoccupied &&  CharacterState != ECharacterState::ESC_Unequipped)
+	Super::Attack();
+	if(CanAttack())
 	{
 		PlayAttackMontage();
 		ActionState = EActionState::EAS_Attacking;
@@ -139,29 +140,12 @@ void ASlashCharacter::Attack()
 
 }
 
-void ASlashCharacter::PlayAttackMontage()
+bool ASlashCharacter::CanAttack()
 {
-	TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
-	if (AnimInstance && AttackMontage)
-	{
-		AnimInstance->Montage_Play(AttackMontage);
-		const int32 Selection = FMath::RandRange(0,1);
-		FName SelectionName = FName();
-		switch (Selection)
-		{
-		case 0:
-			SelectionName = FName("Attack1");
-			break;
-		case 1:
-			SelectionName = FName("Attack2");
-			break;
-		default:
-			break;
-		}
-
-		AnimInstance->Montage_JumpToSection(SelectionName,AttackMontage);
-	}
+	return  ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ESC_Unequipped;
 }
+
 
 void ASlashCharacter::PlayEquipMontage(FName SectionName)
 {

@@ -26,15 +26,29 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Attack();
 	virtual void Die();
+	virtual  bool CanAttack();
+	bool IsAlive();
+	void  DisableCapsule();
+	
 
 	/**
 	 *Play Montage functions
 	 */
-	virtual void PlayAttackMontage();
+	
 	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
+	void PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const FName& SectionName);
+	int32 PlayRandomMontageSetion(TObjectPtr<UAnimMontage> Montage,const TArray<FName>& SectionNames);
+	virtual  int32 PlayDeathMontage();
+	virtual  int32 PlayAttackMontage();
 
 
+
+	
+	void PlayHitSound(const FVector& ImpactPoint);
+	void SpawnHitPartilces (const FVector& ImpactPoint);
+
+	virtual void HandleDamage(float DamageAmount);
 	
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 		TObjectPtr<AWeapon>EquipedWeapon;
@@ -49,12 +63,18 @@ protected:
 		TObjectPtr<UAnimMontage> HitReactMontage;
 	UPROPERTY(EditDefaultsOnly, Category = Montages)
 		UAnimMontage* DeathMontage;
+	UPROPERTY(EditAnywhere,Category = combat)
+		TArray<FName> AttackMontageSections;
+
+	UPROPERTY(EditAnywhere,Category = combat)
+	TArray<FName> DeathMontageSections;
+	
 	/*
 	* Components
 	*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAttributeComponent> Attributes;
-
+private:
 		
 	UPROPERTY(EditAnywhere, Category = Sounds)
 	USoundBase* HitSound;
@@ -72,3 +92,7 @@ public:
 	
 
 };
+
+
+
+

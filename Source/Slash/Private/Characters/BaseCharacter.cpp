@@ -5,6 +5,8 @@
 #include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
 #include "Components/AttributeComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -28,8 +30,58 @@ void ABaseCharacter::Die()
 {
 }
 
-void ABaseCharacter::PlayAttackMontage()
+bool ABaseCharacter::CanAttack()
 {
+	return false;
+}
+
+
+bool ABaseCharacter::IsAlive()
+{
+	return Attributes && Attributes->IsAlive();
+}
+
+void ABaseCharacter::DisableCapsule()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+int32 ABaseCharacter::PlayAttackMontage()
+{
+	return PlayRandomMontageSetion(AttackMontage,AttackMontageSections);
+	
+}
+
+void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
+{
+	if (HitSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			HitSound,
+			ImpactPoint
+		);
+	}
+}
+
+void ABaseCharacter::SpawnHitPartilces(const FVector& ImpactPoint)
+{
+	if (HitParticles && GetWorld())
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			HitParticles,
+			ImpactPoint
+		);
+	}
+}
+
+void ABaseCharacter::HandleDamage(float DamageAmount)
+{
+	if (Attributes )
+	{
+		Attributes->ReceiveDamge(DamageAmount);
+	}
 }
 
 void ABaseCharacter::PlayHitReactMontage(const FName& SectionName)
@@ -84,6 +136,35 @@ void ABaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + Forward * 60.f, 5.f, FColor::Red, 5.f);
 	UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + ToHit * 60.f, 5.f, FColor::Green, 5.f);
 	*/
+}
+
+void ABaseCharacter::PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const FName& SectionName)
+{
+	TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && Montage)
+	{
+		AnimInstance->Montage_Play(Montage);
+		AnimInstance->Montage_JumpToSection(SectionName,Montage);
+	}
+}
+
+int32 ABaseCharacter::PlayRandomMontageSetion(TObjectPtr<UAnimMontage> Montage, const TArray<FName>& SectionNames)
+{
+	if(SectionNames.IsEmpty()) return -1 ;
+		const int32  MaxSectionsIndex = SectionNames.Num()-1;
+		const int32 Selection = FMath::RandRange(0,MaxSectionsIndex);
+		PlayMontageSection(Montage,SectionNames[Selection]);
+		return Selection;
+	
+	
+}
+
+int32 ABaseCharacter::PlayDeathMontage()
+{
+	
+	return PlayRandomMontageSetion(DeathMontage,DeathMontageSections);
+
+	
 }
 
 void ABaseCharacter::Tick(float DeltaTime)
