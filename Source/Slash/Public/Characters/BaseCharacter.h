@@ -65,9 +65,9 @@ private:
 	void PlayMontageSection(TObjectPtr<UAnimMontage> Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(TObjectPtr<UAnimMontage> Montage,const TArray<FName>& SectionNames);
 	
-	UPROPERTY(EditAnywhere, Category = Sounds)
+	UPROPERTY(EditAnywhere, Category = combat)
 	USoundBase* HitSound;
-	UPROPERTY(EditAnywhere, Category = VisualEffects)
+	UPROPERTY(EditAnywhere, Category = combat)
 	UParticleSystem* HitParticles;
 
 	/**

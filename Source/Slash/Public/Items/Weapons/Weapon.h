@@ -23,6 +23,7 @@ protected:
 
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual  void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	bool ActorIsSameType(AActor* OtherActor);
 
 	UFUNCTION()
 	void OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -39,6 +40,13 @@ public:
 	
 	TArray<TObjectPtr<AActor>> IgnoreActors;
 private:
+	void BoxTrace(FHitResult& BoxHit);
+	
+	UPROPERTY(EditAnywhere , Category = "Weapon Properties")
+	FVector BoxTraceExtent = FVector(5.f);
+
+	UPROPERTY(EditAnywhere , Category = "Weapon Properties")
+	bool bShowBoxDebug;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Properties")
 		TObjectPtr<UBoxComponent> WeaponBox;

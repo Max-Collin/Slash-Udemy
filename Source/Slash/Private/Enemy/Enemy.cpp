@@ -79,6 +79,9 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Tags.Add(FName("Enemy"));
+	
 	HideHealthBar();
 	EnemyController = Cast<AAIController>(GetController());
 	FTimerDelegate TimerDelegate;
@@ -346,7 +349,7 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 			EnemyState != EEnemyState ::EES_Dead &&
 				EnemyState != EEnemyState::EES_Chasing &&
 					EnemyState < EEnemyState::EES_Attacking &&
-					SeenPawn->ActorHasTag(FName("Player"));
+					SeenPawn->ActorHasTag(FName("EngageableTarget"));
 	if (bShouldChaseTarget)
 	{
 		CombatTarget = SeenPawn;

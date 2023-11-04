@@ -7,6 +7,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Interfaces/HitInterface.h"
 #include "NiagaraComponent.h"
+#include "NiagaraDataInterfaceEmitterBinding.h"
 #include "Kismet/GameplayStatics.h"
 
 AWeapon::AWeapon()
@@ -45,39 +46,31 @@ void AWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }
 
-void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+bool AWeapon::ActorIsSameType(AActor* OtherActor)
 {
-	const FVector Start =BoxTraceStart->GetComponentLocation();
-	const FVector End = BoxTraceEnd->GetComponentLocation();
+	return GetOwner()->ActorHasTag("Enemy") && OtherActor->ActorHasTag("Enemy");
+}
 
-	TArray<TObjectPtr<AActor>> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-
-	for(TObjectPtr<AActor> Actor :IgnoreActors)
-	{
-		ActorsToIgnore.AddUnique(Actor);
-	}
+void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                           int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(ActorIsSameType(OtherActor))return;
 	
 	
 	FHitResult BoxHit;
-	UKismetSystemLibrary::BoxTraceSingle(this,Start,End,FVector(5.f,5.f,5.f),BoxTraceStart->GetComponentRotation(),ETraceTypeQuery::TraceTypeQuery1,false,ActorsToIgnore,EDrawDebugTrace::None,BoxHit,true);
+	BoxTrace(BoxHit);
 	
 	if(BoxHit.GetActor())
 	{
+		if(ActorIsSameType(BoxHit.GetActor()))return;
+		
 		IHitInterface* HitInterface = Cast<IHitInterface>(BoxHit.GetActor());
 		if(HitInterface)
 		{
 			UGameplayStatics::ApplyDamage(BoxHit.GetActor(),Damage,GetInstigator()->GetController(),this,UDamageType::StaticClass());
 			HitInterface->Execute_GetHit(BoxHit.GetActor(),BoxHit.ImpactPoint);
 		}
-		IgnoreActors.AddUnique(BoxHit.GetActor());
-		
-
 		CreateFields(BoxHit.ImpactPoint);
-
-		
-		
 	}
 }
 
@@ -107,6 +100,26 @@ void AWeapon::Equip(TObjectPtr<USceneComponent> InParent, FName InSocketName, TO
 	
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
+	
+	
+}
+
+void AWeapon::BoxTrace(FHitResult& BoxHit)
+{
+	const FVector Start =BoxTraceStart->GetComponentLocation();
+	const FVector End = BoxTraceEnd->GetComponentLocation();
+
+	TArray<TObjectPtr<AActor>> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+
+	for(TObjectPtr<AActor> Actor :IgnoreActors)
+	{
+		ActorsToIgnore.AddUnique(Actor);
+	}
+	UKismetSystemLibrary::BoxTraceSingle(this,Start,End,BoxTraceExtent,BoxTraceStart->GetComponentRotation(),ETraceTypeQuery::TraceTypeQuery1,false,ActorsToIgnore,bShowBoxDebug ? EDrawDebugTrace::ForDuration: EDrawDebugTrace::None,BoxHit,true);
+	IgnoreActors.AddUnique(BoxHit.GetActor());
+
+
 	
 	
 }
