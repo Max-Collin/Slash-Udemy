@@ -172,6 +172,11 @@ void ASlashCharacter::FinishEquipping()
 	ActionState = EActionState::EAS_Unoccupied;
 }
 
+void ASlashCharacter::HitReactEnd()
+{
+	 ActionState = EActionState::EAS_Unoccupied;
+}
+
 void ASlashCharacter::Jump()
 {
 	Super::Jump();
@@ -181,8 +186,9 @@ void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint)
 {
 	Super::GetHit_Implementation(ImpactPoint);
 
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	ActionState = EActionState::EAS_HitReaction;
+
+	
 }
 
 
