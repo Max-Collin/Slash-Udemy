@@ -23,7 +23,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 protected:
 	virtual void BeginPlay() override;
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void Attack();
 	virtual void Die();
 	virtual  bool CanAttack();
@@ -43,6 +43,13 @@ protected:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	virtual  int32 PlayDeathMontage();
 	virtual  int32 PlayAttackMontage();
+	void StopAttackMontage();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetTranslationWarpTarget();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetRotationWarpTarget();
 
 
 	void PlayHitSound(const FVector& ImpactPoint);
@@ -54,8 +61,11 @@ protected:
 	TObjectPtr<AWeapon>EquippedWeapon;
 	
 
+	UPROPERTY(BluePrintReadOnly , Category = Combat)
+	AActor* CombatTarget;
 
-	
+	UPROPERTY(EditAnywhere , Category = Combat)
+	double WarpTargetDistance =100.f;
 	/*
 	* Components
 	*/

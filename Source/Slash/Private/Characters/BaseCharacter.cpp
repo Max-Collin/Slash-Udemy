@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 
+
 ABaseCharacter::ABaseCharacter()
 {
 
@@ -22,12 +23,12 @@ void ABaseCharacter::BeginPlay()
 	
 }
 
-void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint)
+void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter)
 {
-	IHitInterface::GetHit_Implementation(ImpactPoint);
+	
 	if (IsAlive())
 	{
-		DirectionalHitReact(ImpactPoint);
+		DirectionalHitReact(Hitter->GetActorLocation());
 	}
 	else Die();
 	
@@ -69,6 +70,37 @@ int32 ABaseCharacter::PlayAttackMontage()
 	
 }
 
+void ABaseCharacter::StopAttackMontage()
+{
+	TObjectPtr<UAnimInstance> AnimInstance = GetMesh()->GetAnimInstance();
+	if(AnimInstance)
+	{
+		AnimInstance->Montage_Stop(0.25,AttackMontage);
+	}
+}
+
+FVector ABaseCharacter::GetTranslationWarpTarget()
+{
+	if(CombatTarget == nullptr) return FVector();
+	const FVector CombatTargetLocation = CombatTarget->GetActorLocation();
+	const FVector Location = GetActorLocation();
+
+	FVector TargetToMe = (Location - CombatTargetLocation).GetSafeNormal();
+	TargetToMe *= WarpTargetDistance;
+
+	
+	return TargetToMe + CombatTargetLocation;
+}
+
+FVector ABaseCharacter::GetRotationWarpTarget()
+{
+	if(CombatTarget)
+	{
+		return CombatTarget->GetActorLocation();
+	}
+	return FVector();
+}
+
 void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
 {
 	if (HitSound)
@@ -79,6 +111,7 @@ void ABaseCharacter::PlayHitSound(const FVector& ImpactPoint)
 			ImpactPoint
 		);
 	}
+	
 }
 
 void ABaseCharacter::SpawnHitParticles(const FVector& ImpactPoint)

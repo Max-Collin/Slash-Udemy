@@ -68,7 +68,7 @@ void AWeapon::OnBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		if(HitInterface)
 		{
 			UGameplayStatics::ApplyDamage(BoxHit.GetActor(),Damage,GetInstigator()->GetController(),this,UDamageType::StaticClass());
-			HitInterface->Execute_GetHit(BoxHit.GetActor(),BoxHit.ImpactPoint);
+			HitInterface->Execute_GetHit(BoxHit.GetActor(),BoxHit.ImpactPoint,GetOwner());
 		}
 		CreateFields(BoxHit.ImpactPoint);
 	}
@@ -116,7 +116,7 @@ void AWeapon::BoxTrace(FHitResult& BoxHit)
 	{
 		ActorsToIgnore.AddUnique(Actor);
 	}
-	UKismetSystemLibrary::BoxTraceSingle(this,Start,End,BoxTraceExtent,BoxTraceStart->GetComponentRotation(),ETraceTypeQuery::TraceTypeQuery1,false,ActorsToIgnore,bShowBoxDebug ? EDrawDebugTrace::ForDuration: EDrawDebugTrace::None,BoxHit,true);
+	UKismetSystemLibrary::BoxTraceSingle(this,Start,End,BoxTraceExtent,BoxTraceStart->GetComponentRotation(),ETraceTypeQuery::TraceTypeQuery1,false,ActorsToIgnore,bShowBoxDebug ? EDrawDebugTrace::None: EDrawDebugTrace::None,BoxHit,true);
 	IgnoreActors.AddUnique(BoxHit.GetActor());
 
 

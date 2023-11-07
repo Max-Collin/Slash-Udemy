@@ -26,7 +26,7 @@ public:
 	/* </AActor> */
 	
 	/* <IHitInterface> */
-	virtual void GetHit_Implementation(const FVector& ImpactPoint) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	/* </IHitInterface> */
 protected:
 	/* <AActor> */
@@ -48,6 +48,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+	
+	
 private:
 	/* AI Behavior */
 	void CheckPatrolTarget();
@@ -85,8 +87,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> WeaponCLass;
 	
-	UPROPERTY()
-	AActor* CombatTarget;
+
 	
 	UPROPERTY(EditAnywhere)
 	double CombatRadius = 1000.f;
@@ -121,10 +122,10 @@ private:
 	FTimerHandle AttackTimer;
 
 	UPROPERTY(EditAnywhere , Category = Combat)
-	float AttackMin = 0.5f;
+	float AttackMin = 0.25f;
 	
 	UPROPERTY(EditAnywhere , Category = Combat)
-	float AttackMax = 1.5f;
+	float AttackMax = 0.75f;
 	
 	UPROPERTY(EditAnywhere , Category = Combat)
 	float ChaseSpeed=300.f;
