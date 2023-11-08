@@ -2,6 +2,8 @@
 
 
 #include "Characters/BaseCharacter.h"
+
+#include "Characters/CharacterTypes.h"
 #include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
 #include "Components/AttributeComponent.h"
@@ -38,6 +40,10 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* H
 
 void ABaseCharacter::Attack()
 {
+	if(CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
+	{
+		CombatTarget = nullptr;
+	}
 }
 
 void ABaseCharacter::AttackEnd()
@@ -46,6 +52,8 @@ void ABaseCharacter::AttackEnd()
 
 void ABaseCharacter::Die()
 {
+	Tags.Add(FName("Dead"));
+	PlayDeathMontage();
 }
 
 bool ABaseCharacter::CanAttack()
@@ -62,6 +70,11 @@ bool ABaseCharacter::IsAlive()
 void ABaseCharacter::DisableCapsule()
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ABaseCharacter::DisableMeshCollision()
+{
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 int32 ABaseCharacter::PlayAttackMontage()
@@ -211,8 +224,19 @@ int32 ABaseCharacter::PlayRandomMontageSection(TObjectPtr<UAnimMontage> Montage,
 
 int32 ABaseCharacter::PlayDeathMontage()
 {
+
+
+	const int32 Selection = PlayRandomMontageSection(DeathMontage,DeathMontageSections);
+	TEnumAsByte<EDeathPose> Pose(Selection);
+
+	if(Pose<EDP_MAX)
+	{
+		
+		DeathPose = Pose;
 	
-	return PlayRandomMontageSection(DeathMontage,DeathMontageSections);
+	}
+	
+	return Selection;
 
 	
 }

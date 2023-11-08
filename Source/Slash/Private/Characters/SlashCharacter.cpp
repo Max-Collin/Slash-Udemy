@@ -9,10 +9,13 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GroomComponent.h"
+#include "Components/AttributeComponent.h"
 #include "Characters/CharacterTypes.h"
 #include "Items/Item.h"
 #include  "items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "Hud/SlashHUD.h"
+#include "Hud/SlashOverlay.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
@@ -50,6 +53,8 @@ ASlashCharacter::ASlashCharacter()
 	
 }
 
+
+
 void ASlashCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -60,6 +65,8 @@ void ASlashCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(IMC_Slash,0);
 		}
+		InitializeSlashOverlay(PlayerController);
+		
 	}
 
 	Tags.Add(FName("EngageableTarget"));
@@ -150,6 +157,13 @@ void ASlashCharacter::PlayEquipMontage(FName SectionName)
 	}
 }
 
+void ASlashCharacter::Die()
+{
+	Super::Die();
+	ActionState = EActionState::EAS_Dead;
+	DisableMeshCollision();
+}
+
 void ASlashCharacter::Disarm()
 {
 	if(EquippedWeapon)
@@ -176,21 +190,64 @@ void ASlashCharacter::HitReactEnd()
 {
 	 ActionState = EActionState::EAS_Unoccupied;
 }
+void ASlashCharacter::InitializeSlashOverlay(APlayerController* PlayerController)
+{
+	TObjectPtr<ASlashHUD> SlashHUD = Cast<ASlashHUD>(PlayerController->GetHUD());
+	if(SlashHUD)
+	{
+			
+		SlashOverlay = SlashHUD->GetSlashOverlay();
+		if(SlashOverlay)
+		{
+			SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+			SlashOverlay->SetStaminaBarPercent(1.f);
+			SlashOverlay->SetGold(0);
+			SlashOverlay->SetSouls(0);
+		}
+	}
+}
+void ASlashCharacter::SetHUDHealth()
+{
+	if(SlashOverlay && Attributes)
+	{
+		SlashOverlay->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
+}
+
+
 
 void ASlashCharacter::Jump()
 {
-	Super::Jump();
+	if(ActionState == EActionState::EAS_Unoccupied)
+	{
+		Super::Jump();
+	}
+	
 }
 
 void ASlashCharacter::GetHit_Implementation(const FVector& ImpactPoint,AActor* Hitter)
 {
 	Super::GetHit_Implementation(ImpactPoint,Hitter);
 
-	ActionState = EActionState::EAS_HitReaction;
+	if (Attributes&&Attributes->GetHealthPercent()>0.f)
+	{
+		ActionState = EActionState::EAS_HitReaction;
+	}
+	
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	
+}
+
+void ASlashCharacter::SetOverlappingItem(AItem* Item)
+{
+	OverlappingItem = Item;
+}
+
+void ASlashCharacter::AddSouls(ASouls* Souls)
+{
+	UE_LOG(LogTemp,Warning,TEXT("Aslashcharacter::souls"))
 }
 
 
@@ -208,5 +265,16 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(AttackAction,ETriggerEvent::Started,this,&ASlashCharacter::Attack);
 	}
 	
+}
+
+
+
+float ASlashCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator,
+                                  AActor* DamageCauser)
+{
+	HandleDamage(DamageAmount);
+
+	SetHUDHealth();
+	return DamageAmount;
 }
 

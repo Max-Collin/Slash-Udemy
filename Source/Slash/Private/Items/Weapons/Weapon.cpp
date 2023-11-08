@@ -93,9 +93,9 @@ void AWeapon::Equip(TObjectPtr<USceneComponent> InParent, FName InSocketName, TO
 
 	ItemState = EItemState::EIS_Equipped;
 
-	if(EmberEffect)
+	if(ItemEffect)
 	{
-	EmberEffect->Deactivate();
+	ItemEffect->Deactivate();
 	}
 	
 	SetOwner(NewOwner);

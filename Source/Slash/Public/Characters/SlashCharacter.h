@@ -6,11 +6,11 @@
 #include "BaseCharacter.h"
 #include "InputActionValue.h"
 #include "Characters/CharacterTypes.h"
-
+#include "Interfaces/PickUpInterface.h"
 #include "SlashCharacter.generated.h"
 
 
-
+class USlashOverlay;
 class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
@@ -21,22 +21,28 @@ class UAnimMontage;
 
 
 UCLASS()
-class SLASH_API ASlashCharacter : public ABaseCharacter
+class SLASH_API ASlashCharacter : public ABaseCharacter , public IPickUpInterface
 {
 	GENERATED_BODY()
 
 public:
 
 	ASlashCharacter();
-	
+
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void Jump() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
+	virtual void SetOverlappingItem(AItem* Item) override;
+	virtual void AddSouls(class ASouls* Souls) override;
 
 protected:
 	
 	virtual void BeginPlay() override;
-
+	
+	
 	
 	 /** Inputs */
 	
@@ -60,6 +66,8 @@ protected:
 	virtual void Attack() override;
 	virtual  bool CanAttack() override;
 	void PlayEquipMontage(FName SectionName);
+	virtual  void Die() override;
+	
 
 	UFUNCTION(BlueprintCallable)
 	void Disarm();
@@ -75,6 +83,9 @@ protected:
 
 
 private:
+	void InitializeSlashOverlay(APlayerController* PlayerController);
+	void SetHUDHealth();
+	
 	/*Character Components*/
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -99,8 +110,12 @@ private:
 	
 	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess="true"))
 	EActionState ActionState = EActionState:: EAS_Unoccupied;
+
+	UPROPERTY()
+	TObjectPtr<USlashOverlay> SlashOverlay;
 public:
-	FORCEINLINE void SetOverlappingItem(TObjectPtr<AItem> Item){OverlappingItem=Item;}
+	
 	
 	FORCEINLINE ECharacterState GetCharacterState() const {return  CharacterState;}
+	FORCEINLINE EActionState GetActionState() const {return ActionState;}
 };

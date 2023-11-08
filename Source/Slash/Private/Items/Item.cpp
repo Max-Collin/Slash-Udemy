@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "Characters/SlashCharacter.h"
 #include "NiagaraComponent.h"
+#include "Interfaces/PickUpInterface.h"
 
 // Sets default values
 AItem::AItem()
@@ -22,8 +23,8 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Sphere"));
 	Sphere->SetupAttachment(GetRootComponent());
 	
-	EmberEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
-	EmberEffect->SetupAttachment(GetRootComponent());
+	ItemEffect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Embers"));
+	ItemEffect->SetupAttachment(GetRootComponent());
 
 }
 
@@ -32,8 +33,7 @@ void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 	//TObjectPtr<UWorld> World = GetWorld();
-	FVector Location = GetActorLocation();
-	FVector Forward = GetActorForwardVector();
+	
 
 
 	Sphere->OnComponentBeginOverlap.AddDynamic(this,&AItem::OnSphereOverlap);
@@ -63,22 +63,22 @@ void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	IPickUpInterface* PickUpInterface = Cast<IPickUpInterface>(OtherActor);
 	
-	if(SlashCharacter)
+	if(PickUpInterface)
 	{
-		SlashCharacter->SetOverlappingItem(this);
+		PickUpInterface->SetOverlappingItem(this);
 	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	ASlashCharacter* SlashCharacter = Cast<ASlashCharacter>(OtherActor);
+	IPickUpInterface* PickUpInterface = Cast<IPickUpInterface>(OtherActor);
 	
-	if(SlashCharacter)
+	if(PickUpInterface)
 	{
-		SlashCharacter->SetOverlappingItem(nullptr);
+		PickUpInterface->SetOverlappingItem(nullptr);
 	}
 }
 float AItem::TransformedSin()

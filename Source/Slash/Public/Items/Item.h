@@ -63,7 +63,7 @@ protected:
 	EItemState ItemState = EItemState::EIS_Hovering;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UNiagaraComponent> EmberEffect;
+	TObjectPtr<UNiagaraComponent> ItemEffect;
 	
 
 private:
