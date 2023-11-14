@@ -36,7 +36,8 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
-	
+	UFUNCTION(BlueprintCallable)
+	virtual void DodgeEnd();
 	/**
 	 *Play Montage functions
 	 */
@@ -44,6 +45,7 @@ protected:
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	virtual  int32 PlayDeathMontage();
 	virtual  int32 PlayAttackMontage();
+	void PlayDodgeMontage();
 	void StopAttackMontage();
 
 	UFUNCTION(BlueprintCallable)
@@ -101,6 +103,10 @@ private:
 
 	UPROPERTY(EditAnywhere,Category = combat)
 	TArray<FName> DeathMontageSections;
+	
+	
+	UPROPERTY(EditDefaultsOnly, Category = Combat)
+	TObjectPtr<UAnimMontage> DodgeMontage;
 public:	
 	
 	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const {return DeathPose;}

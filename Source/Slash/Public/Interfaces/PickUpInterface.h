@@ -22,6 +22,7 @@ class SLASH_API IPickUpInterface
 public:
 	virtual void SetOverlappingItem(class AItem* Item);
 	virtual void AddSouls(class ASouls* Souls);
+	virtual void AddGold(class ATreasure* Gold);
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:

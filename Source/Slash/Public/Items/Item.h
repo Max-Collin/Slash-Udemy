@@ -36,6 +36,9 @@ public:
 
 	UFUNCTION()
 	virtual  void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	virtual void SpawnPickupSound();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -64,7 +67,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraComponent> ItemEffect;
-	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<USoundBase> PickupSound;
 
 private:
 	float RunningTime;

@@ -50,6 +50,10 @@ void ABaseCharacter::AttackEnd()
 {
 }
 
+void ABaseCharacter::DodgeEnd()
+{
+}
+
 void ABaseCharacter::Die()
 {
 	Tags.Add(FName("Dead"));
@@ -81,6 +85,12 @@ int32 ABaseCharacter::PlayAttackMontage()
 {
 	return PlayRandomMontageSection(AttackMontage,AttackMontageSections);
 	
+}
+
+void ABaseCharacter::PlayDodgeMontage()
+{
+
+	PlayMontageSection(DodgeMontage,FName("Default"));
 }
 
 void ABaseCharacter::StopAttackMontage()
@@ -143,7 +153,7 @@ void ABaseCharacter::HandleDamage(float DamageAmount)
 {
 	if (Attributes )
 	{
-		Attributes->ReceiveDamge(DamageAmount);
+		Attributes->ReceiveDamage(DamageAmount);
 	}
 }
 

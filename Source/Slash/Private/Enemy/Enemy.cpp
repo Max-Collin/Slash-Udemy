@@ -7,6 +7,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
 #include "HUD/HealthBarComponent.h"
+#include "Items/Souls.h"
 #include "items/Weapons/Weapon.h"
 #include "Navigation/PathFollowingComponent.h"
 
@@ -103,6 +104,22 @@ void AEnemy::BeginPlay()
 	}
 	SpawnDefaultWeapon();
 }
+
+void AEnemy::SpawnSoul()
+{
+	TObjectPtr<UWorld> World =GetWorld();
+	if(World && SoulClass && Attributes)
+	{
+		const FVector SpawnLocation = GetActorLocation() +FVector(0.f,0.f,0.f);
+		TObjectPtr<ASouls> SpawnedSoul = World->SpawnActor<ASouls>(SoulClass,SpawnLocation,GetActorRotation());
+		if(SpawnedSoul)
+		{
+			SpawnedSoul->SetSouls(Attributes->GetSouls());
+		}
+		
+	}
+}
+
 void AEnemy::Die()
 {
 	Super::Die();
@@ -114,6 +131,8 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement=false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	SpawnSoul();
 	
 }
 

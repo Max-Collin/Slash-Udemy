@@ -16,12 +16,14 @@
 #include "Animation/AnimMontage.h"
 #include "Hud/SlashHUD.h"
 #include "Hud/SlashOverlay.h"
+#include "Items/Souls.h"
+#include "Items/Treasure.h"
 
 // Sets default values
 ASlashCharacter::ASlashCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -53,6 +55,15 @@ ASlashCharacter::ASlashCharacter()
 	
 }
 
+void ASlashCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if(Attributes&&SlashOverlay)
+	{
+		Attributes->RegenStamina(DeltaTime);
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
 
 
 void ASlashCharacter::BeginPlay()
@@ -129,6 +140,29 @@ void ASlashCharacter::Equip()
 	}		
 }
 
+bool ASlashCharacter::IsOccupied()
+{
+	return ActionState != EActionState::EAS_Unoccupied;
+}
+
+bool ASlashCharacter::HasStamina()
+{
+	
+	return Attributes&&Attributes->GetStamina() >= Attributes->GetDodgeCost();
+}
+
+void ASlashCharacter::Dodge()
+{
+	if(IsOccupied()&&!HasStamina()) return;
+	PlayDodgeMontage();
+	ActionState = EActionState::EAS_Dodge;
+	if(Attributes&&SlashOverlay)
+	{
+		Attributes->UseStamina(Attributes->GetDodgeCost());
+		SlashOverlay->SetStaminaBarPercent(Attributes->GetStaminaPercent());
+	}
+}
+
 void ASlashCharacter::Attack()
 {
 	Super::Attack();
@@ -138,6 +172,12 @@ void ASlashCharacter::Attack()
 		ActionState = EActionState::EAS_Attacking;
 	}
 
+}
+
+void ASlashCharacter::DodgeEnd()
+{
+	Super::DodgeEnd();
+	ActionState = EActionState::EAS_Unoccupied;
 }
 
 bool ASlashCharacter::CanAttack()
@@ -163,6 +203,8 @@ void ASlashCharacter::Die()
 	ActionState = EActionState::EAS_Dead;
 	DisableMeshCollision();
 }
+
+
 
 void ASlashCharacter::Disarm()
 {
@@ -247,7 +289,21 @@ void ASlashCharacter::SetOverlappingItem(AItem* Item)
 
 void ASlashCharacter::AddSouls(ASouls* Souls)
 {
-	UE_LOG(LogTemp,Warning,TEXT("Aslashcharacter::souls"))
+	if(Attributes && SlashOverlay)
+	{
+		Attributes->AddSouls(Souls->GetSouls());
+		SlashOverlay->SetSouls(Attributes->GetSouls());
+	}
+	
+}
+
+void ASlashCharacter::AddGold(ATreasure* Gold)
+{
+	if(Attributes && SlashOverlay)
+	{
+		Attributes->AddGold(Gold->GetGold());
+		SlashOverlay->SetGold(Attributes->GetGold());
+	}
 }
 
 
@@ -263,6 +319,7 @@ void ASlashCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Started,this,&ASlashCharacter::Jump);
 		EnhancedInputComponent->BindAction(EquipAction,ETriggerEvent::Started,this,&ASlashCharacter::Equip);
 		EnhancedInputComponent->BindAction(AttackAction,ETriggerEvent::Started,this,&ASlashCharacter::Attack);
+		EnhancedInputComponent->BindAction(DodgeAction,ETriggerEvent::Started,this,&ASlashCharacter::Dodge);
 	}
 	
 }

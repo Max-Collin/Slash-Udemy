@@ -8,6 +8,7 @@
 #include "Characters/SlashCharacter.h"
 #include "NiagaraComponent.h"
 #include "Interfaces/PickUpInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AItem::AItem()
@@ -81,6 +82,15 @@ void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 		PickUpInterface->SetOverlappingItem(nullptr);
 	}
 }
+
+void AItem::SpawnPickupSound()
+{
+	if(PickupSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(this,PickupSound,GetActorLocation());
+	}
+}
+
 float AItem::TransformedSin()
 {
 	return Amplitude * FMath::Sin(RunningTime * TimeConstant);

@@ -17,7 +17,9 @@ class UCameraComponent;
 class USpringArmComponent;
 class UGroomComponent;
 class AItem;
+class ASouls;
 class UAnimMontage;
+class ATreasure;
 
 
 UCLASS()
@@ -28,7 +30,7 @@ class SLASH_API ASlashCharacter : public ABaseCharacter , public IPickUpInterfac
 public:
 
 	ASlashCharacter();
-
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
@@ -36,7 +38,8 @@ public:
 	virtual void Jump() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* Hitter) override;
 	virtual void SetOverlappingItem(AItem* Item) override;
-	virtual void AddSouls(class ASouls* Souls) override;
+	virtual void AddSouls( ASouls* Souls) override;
+	virtual void AddGold(ATreasure* Gold) override;
 
 protected:
 	
@@ -58,13 +61,20 @@ protected:
 	TObjectPtr<UInputAction> EquipAction;
 	UPROPERTY(	EditAnywhere, Category = Input)
 	TObjectPtr<UInputAction> AttackAction;
+	UPROPERTY(	EditAnywhere, Category = Input)
+	TObjectPtr<UInputAction> DodgeAction;
 	    
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Equip();
+	bool IsOccupied();
+	bool HasStamina();
+	void Dodge();
 	/*Combat*/
 	virtual void Attack() override;
+	virtual void DodgeEnd() override;
 	virtual  bool CanAttack() override;
+	
 	void PlayEquipMontage(FName SectionName);
 	virtual  void Die() override;
 	
@@ -113,6 +123,10 @@ private:
 
 	UPROPERTY()
 	TObjectPtr<USlashOverlay> SlashOverlay;
+
+
+	
+	
 public:
 	
 	
