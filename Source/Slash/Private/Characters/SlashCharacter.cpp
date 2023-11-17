@@ -153,7 +153,7 @@ bool ASlashCharacter::HasStamina()
 
 void ASlashCharacter::Dodge()
 {
-	if(IsOccupied()&&!HasStamina()) return;
+	if(IsOccupied() || !HasStamina()) return;
 	PlayDodgeMontage();
 	ActionState = EActionState::EAS_Dodge;
 	if(Attributes&&SlashOverlay)
