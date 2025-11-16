@@ -15,20 +15,22 @@
 		}
 	],
 	"Plugins": [
-		{
-			"Name": "ModelingToolsEditorMode",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
-		},
-		{
-			"Name": "HairStrands",
-			"Enabled": true
-		},
-		{
-			"Name": "MotionWarping",
-			"Enabled": true
-		}
-	]
+    {
+        "Name": "ModelingToolsEditorMode",
+        "Enabled": true,
+        "TargetAllowList": [ "Editor" ]
+    },
+    {
+        "Name": "HairStrands",
+        "Enabled": true
+    },
+    {
+        "Name": "MotionWarping",
+        "Enabled": true
+    },
+    {
+        "Name": "USDImporter",
+        "Enabled": false
+    }
+]
 }

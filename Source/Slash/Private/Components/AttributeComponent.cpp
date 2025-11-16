@@ -3,7 +3,7 @@
 
 #include "Components/AttributeComponent.h"
 
-#include "../../../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/Importers/USDImporter/Source/ThirdParty/USD/include/pxr/base/tf/pxrTslRobinMap/robin_hash.h"
+
 
 // Sets default values for this component's properties
 UAttributeComponent::UAttributeComponent()
